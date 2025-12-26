@@ -12,17 +12,24 @@ type Entry struct {
 type Leaderboard struct {
 	scores map[string]int64
 	order  []Entry
+	epoch  uint64
 }
 
 func New() *Leaderboard {
 	return &Leaderboard{
 		scores: make(map[string]int64),
 		order:  make([]Entry, 0),
+		epoch: 0,
 	}
+}
+
+func (lb *Leaderboard) Epoch() uint64 {
+    return lb.epoch
 }
 
 func (lb *Leaderboard) UpdateScore(userID string, score int64) {
 	lb.scores[userID] = score
+	lb.epoch++
 	lb.rebuild()
 }
 

@@ -24,3 +24,20 @@ func TestLeaderboardBasic(t *testing.T) {
 		t.Fatalf("expected neighborhood size 3")
 	}
 }
+
+func TestSnapshotImmutability(t *testing.T) {
+	lb := New()
+
+	lb.UpdateScore("alice", 100)
+	snap := lb.Snapshot()
+
+	lb.UpdateScore("bob", 200)
+
+	if snap.Epoch != 1 {
+		t.Fatalf("expected snapshot epoch 1, got %d", snap.Epoch)
+	}
+
+	if len(snap.Order) != 1 || snap.Order[0].UserID != "alice" {
+		t.Fatalf("snapshot should not change after updates")
+	}
+}
