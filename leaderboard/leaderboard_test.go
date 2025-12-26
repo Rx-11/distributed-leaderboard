@@ -41,3 +41,29 @@ func TestSnapshotImmutability(t *testing.T) {
 		t.Fatalf("snapshot should not change after updates")
 	}
 }
+
+func TestRegionSummary(t *testing.T) {
+	lb := New()
+
+	lb.UpdateScore("alice", 120)
+	lb.UpdateScore("bob", 250)
+	lb.UpdateScore("charlie", 180)
+
+	summary := lb.RegionSummary(2)
+
+	if summary.UserCount != 3 {
+		t.Fatalf("expected user count 3")
+	}
+
+	if len(summary.TopK.Entries) != 2 {
+		t.Fatalf("expected topK size 2")
+	}
+
+	if summary.TopK.Entries[0].UserID != "bob" {
+		t.Fatalf("expected bob as top scorer")
+	}
+
+	if summary.Epoch != lb.Epoch() {
+		t.Fatalf("epoch mismatch")
+	}
+}

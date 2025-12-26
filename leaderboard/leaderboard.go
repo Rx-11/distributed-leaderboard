@@ -19,12 +19,12 @@ func New() *Leaderboard {
 	return &Leaderboard{
 		scores: make(map[string]int64),
 		order:  make([]Entry, 0),
-		epoch: 0,
+		epoch:  0,
 	}
 }
 
 func (lb *Leaderboard) Epoch() uint64 {
-    return lb.epoch
+	return lb.epoch
 }
 
 func (lb *Leaderboard) UpdateScore(userID string, score int64) {
@@ -71,6 +71,54 @@ func (lb *Leaderboard) GetNeighborhood(userID string, n int) []Entry {
 	}
 
 	return append([]Entry(nil), lb.order[start:end]...)
+}
+
+func (lb *Leaderboard) TopKSummary(k int) TopKSummary {
+	if k > len(lb.order) {
+		k = len(lb.order)
+	}
+
+	entries := make([]Entry, k)
+	copy(entries, lb.order[:k])
+
+	return TopKSummary{
+		Epoch:   lb.epoch,
+		Entries: entries,
+	}
+}
+
+func (lb *Leaderboard) HistogramSummary() HistogramSummary {
+	buckets := make(map[int64]int)
+
+	for _, score := range lb.scores {
+		bucket := score / HistogramBucketSize
+		buckets[bucket]++
+	}
+
+	result := make([]HistogramBucket, 0, len(buckets))
+	for bucket, count := range buckets {
+		lower := bucket * HistogramBucketSize
+		upper := lower + HistogramBucketSize - 1
+		result = append(result, HistogramBucket{
+			LowerBound: lower,
+			UpperBound: upper,
+			Count:      count,
+		})
+	}
+
+	return HistogramSummary{
+		Epoch:   lb.epoch,
+		Buckets: result,
+	}
+}
+
+func (lb *Leaderboard) RegionSummary(k int) RegionSummary {
+	return RegionSummary{
+		Epoch:     lb.epoch,
+		TopK:      lb.TopKSummary(k),
+		Histogram: lb.HistogramSummary(),
+		UserCount: len(lb.scores),
+	}
 }
 
 func (lb *Leaderboard) rebuild() {
