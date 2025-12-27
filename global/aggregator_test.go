@@ -21,7 +21,11 @@ func TestGlobalTopK(t *testing.T) {
 		r2.RegionSummary(2),
 	}
 
-	result := ComputeGlobalTopK(summaries, 3)
+	result, err := ComputeGlobalTopK(summaries, 3, Fast)
+
+	if err != nil {
+		t.Fatalf("compute global Top K returned error")
+	}
 
 	if result.Entries[0].UserID != "dave" {
 		t.Fatalf("expected dave as global #1")

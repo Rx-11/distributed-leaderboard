@@ -16,7 +16,7 @@ type GlobalRankEstimate struct {
 	Exact bool
 }
 
-func ComputeGlobalTopK(summaries []leaderboard.RegionSummary, k int) GlobalTopKResult {
+func ComputeGlobalTopK(summaries []leaderboard.RegionSummary, k int, mode ConsistencyMode) (GlobalTopKResult, error) {
 
 	all := make([]leaderboard.Entry, 0)
 
@@ -25,6 +25,10 @@ func ComputeGlobalTopK(summaries []leaderboard.RegionSummary, k int) GlobalTopKR
 	for _, s := range summaries {
 		epochs = append(epochs, s.Epoch)
 		all = append(all, s.TopK.Entries...)
+	}
+
+	if err := CheckEpochAlignment(epochs, mode); err != nil {
+		return GlobalTopKResult{}, err
 	}
 
 	sort.Slice(all, func(i, j int) bool {
@@ -41,7 +45,7 @@ func ComputeGlobalTopK(summaries []leaderboard.RegionSummary, k int) GlobalTopKR
 	return GlobalTopKResult{
 		Epochs:  epochs,
 		Entries: all[:k],
-	}
+	}, nil
 }
 
 func EstimateGlobalRank(user leaderboard.Entry, localRank int, summaries []leaderboard.RegionSummary) GlobalRankEstimate {
