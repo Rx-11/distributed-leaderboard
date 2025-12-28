@@ -1,8 +1,18 @@
 package leaderboard
 
+import "time"
+
 type Snapshot struct {
 	Epoch uint64
 	Order []Entry
+}
+
+type GlobalSeasonSnapshot struct {
+	SeasonID        SeasonID
+	FinalizedAt     time.Time
+	TopK            []Entry
+	IncludedRegions []RegionID
+	TotalUserCount  int
 }
 
 func (lb *Leaderboard) Snapshot() Snapshot {

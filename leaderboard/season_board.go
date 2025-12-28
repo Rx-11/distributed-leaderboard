@@ -33,3 +33,11 @@ func (sb *SeasonBoard) Freeze() error {
 	sb.season.State = SeasonFrozen
 	return nil
 }
+
+func (sb *SeasonBoard) GetRank() *Leaderboard {
+	return sb.rank
+}
+
+func (sb *SeasonBoard) GetSeason() *Season {
+	return &sb.season
+}

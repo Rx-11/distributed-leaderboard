@@ -80,3 +80,8 @@ func (c *SummaryCache) FreshTTL() time.Duration {
 func (c *SummaryCache) StaleTTL() time.Duration {
 	return c.staleTTL
 }
+
+func (c *SummaryCache) Get(region leaderboard.RegionID) (CachedSummary, bool) {
+	entry, ok := c.entries[region]
+	return entry, ok
+}

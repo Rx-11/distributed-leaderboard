@@ -128,6 +128,10 @@ func (lb *Leaderboard) RegionSummary(k int) RegionSummary {
 	}
 }
 
+func (lb *Leaderboard) GetFull() []Entry {
+	return lb.order
+}
+
 func (lb *Leaderboard) rebuild() {
 	lb.order = lb.order[:0]
 	for userID, score := range lb.scores {
