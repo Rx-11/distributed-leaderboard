@@ -3,7 +3,7 @@ package leaderboard
 import "testing"
 
 func TestLeaderboardBasic(t *testing.T) {
-	lb := New()
+	lb := New("us-east")
 
 	lb.UpdateScore("alice", 100)
 	lb.UpdateScore("bob", 200)
@@ -26,7 +26,7 @@ func TestLeaderboardBasic(t *testing.T) {
 }
 
 func TestSnapshotImmutability(t *testing.T) {
-	lb := New()
+	lb := New("us-east")
 
 	lb.UpdateScore("alice", 100)
 	snap := lb.Snapshot()
@@ -43,7 +43,7 @@ func TestSnapshotImmutability(t *testing.T) {
 }
 
 func TestRegionSummary(t *testing.T) {
-	lb := New()
+	lb := New("us-east")
 
 	lb.UpdateScore("alice", 120)
 	lb.UpdateScore("bob", 250)

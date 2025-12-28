@@ -19,7 +19,10 @@ type HistogramSummary struct {
 	Buckets []HistogramBucket
 }
 
+type RegionID string
+
 type RegionSummary struct {
+	Region    RegionID
 	Epoch     uint64
 	TopK      TopKSummary
 	Histogram HistogramSummary

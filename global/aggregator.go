@@ -48,9 +48,12 @@ func ComputeGlobalTopK(summaries []leaderboard.RegionSummary, k int, mode Consis
 	}, nil
 }
 
-func EstimateGlobalRank(user leaderboard.Entry, localRank int, summaries []leaderboard.RegionSummary) GlobalRankEstimate {
+func EstimateGlobalRank(user leaderboard.Entry, localRank int, localRegion leaderboard.RegionID, summaries []leaderboard.RegionSummary) GlobalRankEstimate {
 	rank := localRank
 	for _, s := range summaries {
+		if s.Region == localRegion {
+			continue
+		}
 		for _, b := range s.Histogram.Buckets {
 			if b.LowerBound > user.Score {
 				rank += b.Count

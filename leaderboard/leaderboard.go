@@ -10,17 +10,23 @@ type Entry struct {
 }
 
 type Leaderboard struct {
+	region RegionID
 	scores map[string]int64
 	order  []Entry
 	epoch  uint64
 }
 
-func New() *Leaderboard {
+func New(region RegionID) *Leaderboard {
 	return &Leaderboard{
+		region: region,
 		scores: make(map[string]int64),
 		order:  make([]Entry, 0),
 		epoch:  0,
 	}
+}
+
+func (lb *Leaderboard) Region() RegionID {
+	return lb.region
 }
 
 func (lb *Leaderboard) Epoch() uint64 {
@@ -114,6 +120,7 @@ func (lb *Leaderboard) HistogramSummary() HistogramSummary {
 
 func (lb *Leaderboard) RegionSummary(k int) RegionSummary {
 	return RegionSummary{
+		Region:    lb.region,
 		Epoch:     lb.epoch,
 		TopK:      lb.TopKSummary(k),
 		Histogram: lb.HistogramSummary(),

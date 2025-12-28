@@ -7,8 +7,8 @@ import (
 )
 
 func TestGlobalTopK(t *testing.T) {
-	r1 := leaderboard.New()
-	r2 := leaderboard.New()
+	r1 := leaderboard.New("us-east")
+	r2 := leaderboard.New("us-west")
 
 	r1.UpdateScore("alice", 100)
 	r1.UpdateScore("bob", 200)
@@ -29,5 +29,27 @@ func TestGlobalTopK(t *testing.T) {
 
 	if result.Entries[0].UserID != "dave" {
 		t.Fatalf("expected dave as global #1")
+	}
+}
+
+func TestRankEstimateNoDoubleCount(t *testing.T) {
+	r1 := leaderboard.New("us-east")
+	r2 := leaderboard.New("eu-west")
+
+	r1.UpdateScore("alice", 100)
+	r2.UpdateScore("bob", 200)
+
+	s1 := r1.RegionSummary(10)
+	s2 := r2.RegionSummary(10)
+
+	est := EstimateGlobalRank(
+		leaderboard.Entry{UserID: "alice", Score: 100},
+		1,
+		"us-east",
+		[]leaderboard.RegionSummary{s1, s2},
+	)
+
+	if est.Rank != 2 {
+		t.Fatalf("expected rank 2, got %d", est.Rank)
 	}
 }
