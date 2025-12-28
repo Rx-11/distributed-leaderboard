@@ -10,7 +10,7 @@ import (
 func TestSummaryCacheFreshness(t *testing.T) {
 	now := time.Now()
 
-	cache := NewSummaryCache("us-east", time.Second)
+	cache := NewSummaryCache("us-east", time.Second, 60*time.Minute)
 
 	s := leaderboard.RegionSummary{
 		Region: "eu-west",

@@ -12,17 +12,18 @@ type CachedSummary struct {
 }
 
 type SummaryCache struct {
-	self    leaderboard.RegionID
-	entries map[leaderboard.RegionID]CachedSummary
-	maxAge  time.Duration
+	self     leaderboard.RegionID
+	entries  map[leaderboard.RegionID]CachedSummary
+	freshTTL time.Duration
+	staleTTL time.Duration
 }
 
-func NewSummaryCache(self leaderboard.RegionID, maxAge time.Duration) *SummaryCache {
-
+func NewSummaryCache(self leaderboard.RegionID, freshTTL time.Duration, staleTTL time.Duration) *SummaryCache {
 	return &SummaryCache{
-		self:    self,
-		entries: make(map[leaderboard.RegionID]CachedSummary),
-		maxAge:  maxAge,
+		self:     self,
+		entries:  make(map[leaderboard.RegionID]CachedSummary),
+		freshTTL: freshTTL,
+		staleTTL: staleTTL,
 	}
 }
 
@@ -44,17 +45,38 @@ func (c *SummaryCache) IsFresh(region leaderboard.RegionID, now time.Time) bool 
 		return false
 	}
 
-	return now.Sub(entry.ReceivedAt) <= c.maxAge
+	return now.Sub(entry.ReceivedAt) <= c.freshTTL
 }
 
 func (c *SummaryCache) ActiveSummaries(now time.Time) []leaderboard.RegionSummary {
 	out := make([]leaderboard.RegionSummary, 0)
 
 	for _, entry := range c.entries {
-		if now.Sub(entry.ReceivedAt) <= c.maxAge {
+		if now.Sub(entry.ReceivedAt) <= c.freshTTL {
 			out = append(out, entry.Summary)
 		}
 	}
 
 	return out
+}
+
+func (c *SummaryCache) Entries() map[leaderboard.RegionID]CachedSummary {
+	return c.entries
+}
+
+func (c *SummaryCache) AllSummaries() []CachedSummary {
+	summaries := []CachedSummary{}
+	for _, entry := range c.entries {
+		summaries = append(summaries, entry)
+	}
+
+	return summaries
+}
+
+func (c *SummaryCache) FreshTTL() time.Duration {
+	return c.freshTTL
+}
+
+func (c *SummaryCache) StaleTTL() time.Duration {
+	return c.staleTTL
 }
