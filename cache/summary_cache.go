@@ -48,7 +48,6 @@ func (c *SummaryCache) IsFresh(region leaderboard.RegionID, now time.Time) bool 
 }
 
 func (c *SummaryCache) ActiveSummaries(now time.Time) []leaderboard.RegionSummary {
-
 	out := make([]leaderboard.RegionSummary, 0)
 
 	for _, entry := range c.entries {
