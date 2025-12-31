@@ -41,7 +41,6 @@ func protoToDomain(req *pb.RegionSummary) leaderboard.RegionSummary {
 
 	return leaderboard.RegionSummary{
 		Region:    leaderboard.RegionID(req.RegionId),
-		Season:    leaderboard.SeasonID(req.SeasonId),
 		Epoch:     req.Epoch,
 		IsFinal:   req.IsFinal,
 		UserCount: int(req.UserCount),

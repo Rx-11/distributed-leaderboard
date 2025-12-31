@@ -12,8 +12,7 @@ import (
 func TestExportSnapshotToCSV(t *testing.T) {
 
 	now := time.Now()
-	snapshot := &leaderboard.GlobalSeasonSnapshot{
-		SeasonID:    "season_1_final",
+	snapshot := &leaderboard.GlobalSnapshot{
 		FinalizedAt: now,
 		TopK: []leaderboard.Entry{
 			{UserID: "alice", Score: 500},
@@ -37,12 +36,12 @@ func TestExportSnapshotToCSV(t *testing.T) {
 		t.Fatalf("expected 4 lines (1 header + 3 rows), got %d", len(lines))
 	}
 
-	expectedHeader := "Rank,UserID,Score,SeasonID,FinalizedAt"
+	expectedHeader := "Rank,UserID,Score,FinalizedAt"
 	if lines[0] != expectedHeader {
 		t.Errorf("header mismatch.\nGot: %s\nWant: %s", lines[0], expectedHeader)
 	}
 
-	if !strings.Contains(lines[1], "1,alice,500,season_1_final") {
+	if !strings.Contains(lines[1], "1,alice,500") {
 		t.Errorf("row 1 incorrect: %s", lines[1])
 	}
 }

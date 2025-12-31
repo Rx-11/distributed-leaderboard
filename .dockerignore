@@ -1,0 +1,6 @@
+# .dockerignore
+.git
+bin/
+data/
+*.log
+.env*

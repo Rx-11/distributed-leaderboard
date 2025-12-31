@@ -7,8 +7,7 @@ type Snapshot struct {
 	Order []Entry
 }
 
-type GlobalSeasonSnapshot struct {
-	SeasonID        SeasonID
+type GlobalSnapshot struct {
 	FinalizedAt     time.Time
 	TopK            []Entry
 	IncludedRegions []RegionID

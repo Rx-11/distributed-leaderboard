@@ -63,7 +63,6 @@ func domainToProto(s leaderboard.RegionSummary) *pb.RegionSummary {
 
 	return &pb.RegionSummary{
 		RegionId:  string(s.Region),
-		SeasonId:  string(s.Season),
 		Epoch:     s.Epoch,
 		IsFinal:   s.IsFinal,
 		UserCount: int32(s.UserCount),

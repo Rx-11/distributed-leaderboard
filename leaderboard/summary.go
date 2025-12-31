@@ -22,7 +22,6 @@ type HistogramSummary struct {
 type RegionID string
 
 type RegionSummary struct {
-	Season    SeasonID
 	Region    RegionID
 	Epoch     uint64
 	TopK      TopKSummary
