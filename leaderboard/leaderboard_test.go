@@ -3,7 +3,10 @@ package leaderboard
 import "testing"
 
 func TestLeaderboardBasic(t *testing.T) {
-	lb := New("us-east")
+	lb, err := New("us-east", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
 
 	lb.UpdateScore("alice", 100)
 	lb.UpdateScore("bob", 200)
@@ -26,7 +29,10 @@ func TestLeaderboardBasic(t *testing.T) {
 }
 
 func TestSnapshotImmutability(t *testing.T) {
-	lb := New("us-east")
+	lb, err := New("us-east", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
 
 	lb.UpdateScore("alice", 100)
 	snap := lb.Snapshot()
@@ -43,7 +49,10 @@ func TestSnapshotImmutability(t *testing.T) {
 }
 
 func TestRegionSummary(t *testing.T) {
-	lb := New("us-east")
+	lb, err := New("us-east", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
 
 	lb.UpdateScore("alice", 120)
 	lb.UpdateScore("bob", 250)

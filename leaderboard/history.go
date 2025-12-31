@@ -16,8 +16,11 @@ func (hl *HistoricalLeaderboards) CreateSeason(s Season) error {
 	if _, ok := hl.seasons[s.ID]; ok {
 		return errors.New("season already exists")
 	}
-
-	hl.seasons[s.ID] = NewSeasonBoard(s)
+	var err error
+	hl.seasons[s.ID], err = NewSeasonBoard(s)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

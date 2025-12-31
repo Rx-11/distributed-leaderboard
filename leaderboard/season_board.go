@@ -3,6 +3,8 @@ package leaderboard
 import (
 	"errors"
 	"time"
+
+	"github.com/Rx-11/distributed-leaderboard/config"
 )
 
 type SeasonBoard struct {
@@ -10,11 +12,15 @@ type SeasonBoard struct {
 	rank   *Leaderboard
 }
 
-func NewSeasonBoard(season Season) *SeasonBoard {
+func NewSeasonBoard(season Season) (*SeasonBoard, error) {
+	lb, err := New(RegionID(config.GetConfig().RegionID), season.ID, config.GetConfig().DataDir)
+	if err != nil {
+		return nil, err
+	}
 	return &SeasonBoard{
 		season: season,
-		rank:   New(RegionID(season.ID)),
-	}
+		rank:   lb,
+	}, nil
 }
 
 func (sb *SeasonBoard) Update(entry Entry) error {

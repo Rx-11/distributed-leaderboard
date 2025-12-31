@@ -1,7 +1,11 @@
 package leaderboard
 
 import (
+	"fmt"
+	"log"
 	"sort"
+
+	"github.com/Rx-11/distributed-leaderboard/wal"
 )
 
 type Entry struct {
@@ -14,15 +18,40 @@ type Leaderboard struct {
 	scores map[string]int64
 	order  []Entry
 	epoch  uint64
+	wal    *wal.WAL
 }
 
-func New(region RegionID) *Leaderboard {
-	return &Leaderboard{
+func New(region RegionID, dataDir string) (*Leaderboard, error) {
+	lb := &Leaderboard{
 		region: region,
 		scores: make(map[string]int64),
 		order:  make([]Entry, 0),
 		epoch:  0,
 	}
+
+	walPath := fmt.Sprintf("%s/%s.log", dataDir, region)
+	log.Printf("Recovering state from %s...", walPath)
+	entries, err := wal.Recover(walPath)
+	if err != nil {
+		return nil, fmt.Errorf("recovery failed: %w", err)
+	}
+
+	for _, e := range entries {
+		// Apply directly to memory without writing to WAL again
+		lb.scores[e.UserID] = e.Score
+		lb.epoch++ // Epoch advances on recovery too
+	}
+	lb.rebuild() // Sort the recovered data
+	log.Printf("Recovered %d entries.", len(entries))
+
+	// 3. Open WAL for new writes
+	wal, err := wal.OpenWAL(walPath)
+	if err != nil {
+		return nil, err
+	}
+	lb.wal = wal
+
+	return lb, nil
 }
 
 func (lb *Leaderboard) Region() RegionID {
@@ -33,10 +62,17 @@ func (lb *Leaderboard) Epoch() uint64 {
 	return lb.epoch
 }
 
-func (lb *Leaderboard) UpdateScore(userID string, score int64) {
+func (lb *Leaderboard) UpdateScore(userID string, score int64) error {
+
+	if err := lb.wal.Write(userID, score); err != nil {
+		return fmt.Errorf("wal write error: %w", err)
+	}
+
 	lb.scores[userID] = score
 	lb.epoch++
 	lb.rebuild()
+
+	return nil
 }
 
 func (lb *Leaderboard) GetRank(userID string) (int, bool) {
@@ -46,6 +82,11 @@ func (lb *Leaderboard) GetRank(userID string) (int, bool) {
 		}
 	}
 	return 0, false
+}
+
+func (lb *Leaderboard) GetScore(userID string) (int64, bool) {
+	score, ok := lb.scores[userID]
+	return score, ok
 }
 
 func (lb *Leaderboard) GetTopK(k int) []Entry {

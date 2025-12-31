@@ -85,3 +85,14 @@ func (c *SummaryCache) Get(region leaderboard.RegionID) (CachedSummary, bool) {
 	entry, ok := c.entries[region]
 	return entry, ok
 }
+
+func (c *SummaryCache) FindUser(userID string) (int64, bool) {
+	for _, entry := range c.entries {
+		for _, u := range entry.Summary.TopK.Entries {
+			if u.UserID == userID {
+				return u.Score, true
+			}
+		}
+	}
+	return 0, false
+}

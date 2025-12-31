@@ -7,8 +7,14 @@ import (
 )
 
 func TestGlobalTopK(t *testing.T) {
-	r1 := leaderboard.New("us-east")
-	r2 := leaderboard.New("us-west")
+	r1, err := leaderboard.New("us-east", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
+	r2, err := leaderboard.New("us-west", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
 
 	r1.UpdateScore("alice", 100)
 	r1.UpdateScore("bob", 200)
@@ -33,8 +39,14 @@ func TestGlobalTopK(t *testing.T) {
 }
 
 func TestRankEstimateNoDoubleCount(t *testing.T) {
-	r1 := leaderboard.New("us-east")
-	r2 := leaderboard.New("eu-west")
+	r1, err := leaderboard.New("us-east", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
+	r2, err := leaderboard.New("us-west", "")
+	if err != nil {
+		t.Fatalf("unable to create new leaderboard")
+	}
 
 	r1.UpdateScore("alice", 100)
 	r2.UpdateScore("bob", 200)
